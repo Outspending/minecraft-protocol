@@ -2,16 +2,16 @@ use simdnbt::owned::{Nbt, NbtCompound, NbtTag};
 
 use crate::network::types::TemperatureModifier;
 
-pub struct Biome {
-    pub name: String,
+pub struct Biome<'a> {
+    pub name: &'a str,
     pub has_precipitation: bool,
     pub temperature: f32,
     pub temperature_modifier: TemperatureModifier,
     pub downfall: f32,
-    pub effects: BiomeEffects,
+    pub effects: BiomeEffects<'a>,
 }
 
-impl Biome {
+impl<'a> Biome<'a> {
     pub fn to_nbt(&self) -> Nbt {
         Nbt::new(
             "".into(),
@@ -28,22 +28,22 @@ impl Biome {
     }
 }
 
-pub struct BiomeEffects {
+pub struct BiomeEffects<'a> {
     pub fog_color: i32,
     pub water_color: i32,
     pub water_fog_color: i32,
     pub sky_color: i32,
     pub foliage_color: Option<i32>,
     pub grass_color: Option<i32>,
-    pub grass_color_modifier: Option<String>,
-    pub particle: Option<Particle>,
-    pub ambient_sound: Option<AmbientSound>,
-    pub mood_sound: Option<MoodSound>,
-    pub additions_sound: Option<AdditionsSound>,
-    pub music: Option<Music>,
+    pub grass_color_modifier: Option<&'a str>,
+    pub particle: Option<Particle<'a>>,
+    pub ambient_sound: Option<AmbientSound<'a>>,
+    pub mood_sound: Option<MoodSound<'a>>,
+    pub additions_sound: Option<AdditionsSound<'a>>,
+    pub music: Option<Music<'a>>,
 }
 
-impl BiomeEffects {
+impl<'a> BiomeEffects<'a> {
     pub fn to_nbt(&self) -> NbtTag {
         NbtTag::Compound(NbtCompound::from_values(vec![
             ("fog_color".into(), NbtTag::Int(self.fog_color)),
@@ -54,34 +54,34 @@ impl BiomeEffects {
     }
 }
 
-pub struct Particle {
-    pub options: ParticleOptions,
+pub struct Particle<'a> {
+    pub options: ParticleOptions<'a>,
     pub probability: f32,
 }
 
-pub struct ParticleOptions {
-    pub particle_type: String, // TODO: More things
+pub struct ParticleOptions<'a> {
+    pub particle_type: &'a str, // TODO: More things
 }
 
-pub struct AmbientSound {
-    pub sound_id: String,
+pub struct AmbientSound<'a> {
+    pub sound_id: &'a str,
     pub range: Option<f32>,
 }
 
-pub struct MoodSound {
-    pub sound: String,
+pub struct MoodSound<'a> {
+    pub sound: &'a str,
     pub tick_delay: i32,
     pub block_search_extent: i32,
     pub offset: f64,
 }
 
-pub struct AdditionsSound {
-    pub sound: String,
+pub struct AdditionsSound<'a> {
+    pub sound: &'a str,
     pub tick_chance: f64,
 }
 
-pub struct Music {
-    pub sound: String,
+pub struct Music<'a> {
+    pub sound: &'a str,
     pub min_delay: i32,
     pub max_delay: i32,
     pub replace_current_music: bool,

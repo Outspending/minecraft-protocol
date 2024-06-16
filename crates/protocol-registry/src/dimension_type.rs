@@ -2,8 +2,8 @@ use simdnbt::owned::{Nbt, NbtCompound, NbtTag};
 
 use crate::network::types::DimensionEffects;
 
-pub struct DimensionType {
-    pub name: String,
+pub struct DimensionType<'a> {
+    pub name: &'a str,
     pub fixed_time: Option<i64>,
     pub has_skylight: bool,
     pub has_ceiling: bool,
@@ -15,7 +15,7 @@ pub struct DimensionType {
     pub min_y: i32,
     pub height: i32,
     pub logical_height: i32,
-    pub infiniburn: String,
+    pub infiniburn: &'a str,
     pub effects: DimensionEffects,
     pub ambient_light: f32,
     pub piglin_safe: bool,
@@ -24,7 +24,7 @@ pub struct DimensionType {
     pub monster_spawn_block_light_limit: i32,
 }
 
-impl DimensionType {
+impl<'a> DimensionType<'a> {
     pub fn to_nbt(&self) -> Nbt {
         Nbt::new(
             "".into(),
@@ -62,7 +62,7 @@ impl DimensionType {
                 ("logical_height".into(), NbtTag::Int(self.logical_height)),
                 (
                     "infiniburn".into(),
-                    NbtTag::String(self.infiniburn.clone().into()),
+                    NbtTag::String(self.infiniburn.into()),
                 ),
                 ("effects".into(), self.effects.to_nbt()),
                 ("ambient_light".into(), NbtTag::Float(self.ambient_light)),
