@@ -1,0 +1,13 @@
+[package]
+name = "protocol-network"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+protocol-registry = { path = "../protocol-registry" }
+
+tokio = { version = "1.38.0", features = ["full"] }
+serde =  { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.117"
+uuid = "1.8.0"
+simdnbt = "0.5.2"
