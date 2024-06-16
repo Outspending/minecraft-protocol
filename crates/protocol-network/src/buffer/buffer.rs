@@ -1,5 +1,7 @@
+use simdnbt::owned::Nbt;
 use uuid::Uuid;
 
+use crate::identifier::Identifier;
 use crate::{FromNetwork, ToNetwork};
 use std::io::Cursor;
 use std::io::{Read, Write};
@@ -88,6 +90,14 @@ impl ByteBuf {
         self.buf.get_ref().len()
     }
 
+    pub fn get_cursor(&mut self) -> &mut Cursor<Vec<u8>> {
+        &mut self.buf
+    }
+
+    pub fn set_position(&mut self, position: u64) {
+        self.get_cursor().set_position(position);
+    }
+
     pub fn get_rest(&mut self) -> Vec<u8> {
         let mut rest = Vec::new();
         self.buf.read_to_end(&mut rest).unwrap();
@@ -120,5 +130,7 @@ register_buffer! {
     String => (write_string, read_string),
     Uuid => (write_uuid, read_uuid),
     VarInt => (write_varint, read_varint),
-    VarLong => (write_varlong, read_varlong)
+    VarLong => (write_varlong, read_varlong),
+    Nbt => (write_nbt, read_nbt),
+    Identifier => (write_identifier, read_identifier)
 }

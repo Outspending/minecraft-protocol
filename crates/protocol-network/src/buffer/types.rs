@@ -1,8 +1,9 @@
 use std::io::{Read, Write};
 
+use simdnbt::owned::Nbt;
 use uuid::Uuid;
 
-use crate::{FromNetwork, ToNetwork};
+use crate::{identifier::Identifier, FromNetwork, ToNetwork};
 
 use super::{buffer::ByteBuf, varnum::VarInt};
 
@@ -215,5 +216,48 @@ impl<T: FromNetwork> FromNetwork for Vec<T> {
         }
 
         values
+    }
+}
+
+
+impl ToNetwork for Nbt {
+    fn to_network(&self, buf: &mut ByteBuf) {
+        self.write_unnamed(buf.get_mut());
+        buf.set_position(buf.len() as u64 + 1);
+    }
+}
+
+impl FromNetwork for Nbt {
+    fn from_network(buf: &mut ByteBuf) -> Self {
+        todo!()
+    }
+}
+
+impl<'a> ToNetwork for Identifier<'a> {
+    fn to_network(&self, buf: &mut ByteBuf) {
+        buf.write_string(format!("{}", self));
+    }
+}
+
+impl<'a> FromNetwork for Identifier<'a> {
+    fn from_network(buf: &mut ByteBuf) -> Self {
+        todo!()
+    }
+}
+
+impl<T: ToNetwork> ToNetwork for Option<T> {
+    fn to_network(&self, buf: &mut ByteBuf) {
+        match self {
+            Some(value) => {
+                value.to_network(buf);
+            },
+            None => ()
+        }
+    }
+}
+
+impl<T: FromNetwork> FromNetwork for Option<T> {
+    fn from_network(buf: &mut ByteBuf) -> Self {
+        todo!()
     }
 }

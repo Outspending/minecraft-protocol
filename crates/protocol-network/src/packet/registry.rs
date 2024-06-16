@@ -2,7 +2,7 @@ use protocol_registry::{
     armor_trim::{ArmorTrimMaterial, ArmorTrimPattern},
     banner::Banner,
     biome::{Biome, BiomeEffects},
-    chat_type::ChatType,
+    chat_type::{ChatDecoration, ChatType},
     damage_type::DamageType,
     dimension_type::DimensionType,
     network::types::{DimensionEffects, TemperatureModifier},
@@ -13,7 +13,7 @@ use simdnbt::owned::Nbt;
 use crate::{
     buffer::{buffer::ByteBuf, varnum::VarInt},
     tcp::client::connection::MinecraftClient,
-    v1_21::RegistryDataPacket,
+    v1_21::{FinishConfigurationPacket, RegistryDataPacket},
     FromNetwork, ToNetwork,
 };
 
@@ -31,7 +31,7 @@ impl ToNetwork for RegistryEntry {
         buf.write_string(self.entry_id.clone());
         buf.write_bool(self.has_data);
         if self.has_data {
-            self.data.write_unnamed(buf.get_mut());
+            buf.write_nbt(self.data.clone());
         }
     }
 }
@@ -67,8 +67,7 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
 
     client
         .send_packet(&RegistryDataPacket {
-            registry_id: "minecraft:trim_material".to_string(),
-            entry_count: VarInt::from(1),
+            registry_id: "minecraft:worldgen/biome".to_string(),
             entries: vec![RegistryEntry {
                 entry_id: biome.name.clone(),
                 has_data: true,
@@ -79,15 +78,21 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
 
     let chat_type = ChatType {
         name: "minecraft:chat".to_string(),
-        translation_key: "chat.type.text".to_string(),
-        style: None,
-        parameters: "sender".to_string(),
+        chat: ChatDecoration {
+            name: "chat".to_string(),
+            translation_key: "chat.type.text".to_string(),
+            parameters: vec!["sender".to_string()],
+        },
+        narrator: ChatDecoration {
+            name: "narration".to_string(),
+            translation_key: "chat.type.text.narrate".to_string(),
+            parameters: vec!["sender".to_string()],
+        }
     };
 
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:chat_type".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
                 entry_id: chat_type.name.clone(),
                 has_data: true,
@@ -107,7 +112,6 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:trim_pattern".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
                 entry_id: trim_pattern.name.clone(),
                 has_data: true,
@@ -128,7 +132,6 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:trim_material".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
                 entry_id: trim_material.name.clone(),
                 has_data: true,
@@ -142,13 +145,12 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
         wild_texture: "minecraft:entity/wolf/wolf_ashen".to_string(),
         tamed_texture: "minecraft:entity/wolf/wolf_ashen_tame".to_string(),
         angry_texture: "minecraft:entity/wolf/wolf_ashen_angry".to_string(),
-        biomes: "minecraft:snowy_taiga".to_string(),
+        biomes: "minecraft:badlands".to_string(),
     };
 
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:wolf_variant".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
                 entry_id: wolf_variant.name.clone(),
                 has_data: true,
@@ -183,7 +185,6 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:dimension_type".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
                 entry_id: dimension_type.name.clone(),
                 has_data: true,
@@ -192,9 +193,9 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
         })
         .await;
 
-    let damage_type = DamageType {
-        name: "minecraft:arrow".to_string(),
-        message_id: "arrow".to_string(),
+    let fire_damage_type = DamageType {
+        name: "minecraft:in_fire".to_string(),
+        message_id: "inFire".to_string(),
         exhaustion: 0.1,
         scaling: "when_caused_by_living_non_player".to_string(),
         effects: None,
@@ -204,11 +205,10 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:damage_type".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
-                entry_id: damage_type.name.clone(),
+                entry_id: fire_damage_type.name.clone(),
                 has_data: true,
-                data: damage_type.to_nbt(),
+                data: fire_damage_type.to_nbt(),
             }],
         })
         .await;
@@ -222,7 +222,6 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
     client
         .send_packet(&RegistryDataPacket {
             registry_id: "minecraft:banner_pattern".to_string(),
-            entry_count: VarInt::from(1),
             entries: vec![RegistryEntry {
                 entry_id: banner_pattern.name.clone(),
                 has_data: true,
@@ -230,4 +229,6 @@ pub async fn send_registry_packets(client: &mut MinecraftClient) {
             }],
         })
         .await;
+
+    client.send_packet(&FinishConfigurationPacket {}).await;
 }

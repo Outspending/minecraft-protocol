@@ -21,10 +21,6 @@ impl Biome {
                     NbtTag::Byte(self.has_precipitation as i8),
                 ),
                 ("temperature".into(), NbtTag::Float(self.temperature)),
-                (
-                    "temperature_modifier".into(),
-                    self.temperature_modifier.to_nbt(),
-                ),
                 ("downfall".into(), NbtTag::Float(self.downfall)),
                 ("effects".into(), self.effects.to_nbt()),
             ]),

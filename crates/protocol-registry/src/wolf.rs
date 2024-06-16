@@ -18,7 +18,7 @@ impl WolfVariant {
                     NbtTag::String(self.wild_texture.clone().into()),
                 ),
                 (
-                    "tamed_texture".into(),
+                    "tame_texture".into(),
                     NbtTag::String(self.tamed_texture.clone().into()),
                 ),
                 (

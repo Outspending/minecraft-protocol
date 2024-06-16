@@ -15,14 +15,14 @@ impl DamageType {
             "".into(),
             NbtCompound::from_values(vec![
                 (
-                    "message_id".into(),
-                    NbtTag::String(self.message_id.clone().into()),
-                ),
-                (
                     "scaling".into(),
                     NbtTag::String(self.scaling.clone().into()),
                 ),
-                ("exhausion".into(), NbtTag::Float(self.exhaustion)),
+                ("exhaustion".into(), NbtTag::Float(self.exhaustion)),
+                (
+                    "message_id".into(),
+                    NbtTag::String(self.message_id.clone().into()),
+                ),
             ]),
         )
     }
