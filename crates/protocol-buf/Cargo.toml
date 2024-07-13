@@ -1,0 +1,10 @@
+[package]
+name = "protocol-buf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+flate2 = "1.0.30"
+thiserror = "1.0.62"
+tokio = { version = "1.38.0", features = ["full"] }

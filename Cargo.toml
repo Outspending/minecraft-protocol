@@ -1,0 +1,11 @@
+[package]
+name = "minecraft-protocol"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["crates/*"]
+
+[dependencies]
+tokio = { version = "1.38.0", features = ["full"] }
+protocol-core = { path = "crates/protocol-core" }
