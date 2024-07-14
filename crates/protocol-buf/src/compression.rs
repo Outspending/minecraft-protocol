@@ -1,6 +1,7 @@
 use std::io::Write;
 
 use flate2::write::ZlibEncoder;
+use thiserror::Error;
 
 use crate::{
     buffer::{Buffer, BufferResult, NormalBuffer, PacketBuffer},
@@ -48,6 +49,15 @@ pub type CompressionResult<B: Buffer> = BufferResult<B>;
 pub struct CompressionData {
     pub threshold: i32,
     pub compression_type: CompressionType,
+}
+
+impl Default for CompressionData {
+    fn default() -> Self {
+        Self {
+            threshold: 256,
+            compression_type: CompressionType::None,
+        }
+    }
 }
 
 impl CompressionData {
